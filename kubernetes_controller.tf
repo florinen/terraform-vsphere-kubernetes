@@ -95,12 +95,12 @@ resource "vsphere_virtual_machine" "kubernetes_controller" {
 
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p ~/.ssh/",
-      "chmod 700 ~/.ssh",
-      "mv /tmp/authorized_keys ~/.ssh/authorized_keys",
-      "chmod 600 ~/.ssh/authorized_keys",
-      "sudo sed -i 's/#PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config",
-      "sudo service sshd restart"
+      "mkdir -p /root/.ssh/",
+      "chmod 700 /root/.ssh",
+      "mv /tmp/authorized_keys /root/.ssh/authorized_keys",
+      "chmod 600 /root/.ssh/authorized_keys",
+      "sed -i 's/#PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config",
+      "service sshd restart"
     ]
     connection {
       host          = "${var.virtual_machine_kubernetes_controller["ip_address"]}"
@@ -168,10 +168,10 @@ resource "vsphere_virtual_machine" "kubernetes_controller" {
 
 }
 
-data "external" "kubeadm-init-info" {
-  program = ["/usr/bin/bash", "${path.module}/scripts/kubeadm_init_info.sh"]
-  query = {
-    ip_address  = "${vsphere_virtual_machine.kubernetes_controller.default_ip_address}"
-    private_key = "${var.virtual_machine_kubernetes_controller["private_key"]}"
-  }
-}
+# data "external" "kubeadm-init-info" {
+#   program = ["/usr/bin/bash", "${path.module}/scripts/kubeadm_init_info.sh"]
+#   query = {
+#     ip_address  = "${vsphere_virtual_machine.kubernetes_controller.default_ip_address}"
+#     private_key = "${var.virtual_machine_kubernetes_controller["private_key"]}"
+#   }
+# }
