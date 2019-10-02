@@ -1,28 +1,37 @@
 #! /bin/bash
+## UBUNTU
 
-## Install prerequisites.
-#yum install yum-utils device-mapper-persistent-data lvm2 -y
-#sudo apt-get install  curl apt-transport-https ca-certificates gnupg-agent software-properties-common -y
-## Add docker repository.
-# yum-config-manager \
-#     --add-repo \
-#     https://download.docker.com/linux/centos/docker-ce.repo
-sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+# Necessary packages to allow the use of Docker’s repository
+sudo apt-get install -y\
+         apt-transport-https \
+         ca-certificates \
+         curl \
+         gnupg-agent \
+         software-properties-common\
 
-#sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-#curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
-sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+# Add Docker’s GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+# Verify the fingerprint of the GPG key
+sudo apt-key fingerprint 0EBFCD88
+#Add the stable Docker repository
+sudo add-apt-repository \
+           "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+              $(lsb_release -cs) \
+                 stable"
+ 
+## For Ubuntu 19.04 you will need to use the edge / test repository
+#sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge test"
 
-## Install docker.
-sudo apt-get update && sudo apt-get install docker-ce docker-ce=18.06.2~ce~3-0~ubuntu containerd.io -y
+## Update
+sudo apt-get update
+### To check the list of available Docker versions, run ###
+#  apt-cache madison docker-ce
 
-# Run as non-root user
-#sudo usermod -aG docker your-user
+## Install docker
+sudo apt-get install -y docker-ce=5:18.09.0~3-0~ubuntu-bionic 
 
-# Setup daemon
-sudo su -
-cat > /etc/docker/daemon.json <<EOF
+# Setup daemon.
+sudo su - -c "cat > /etc/docker/daemon.json <<EOF
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
   "log-driver": "json-file",
@@ -31,18 +40,29 @@ cat > /etc/docker/daemon.json <<EOF
   },
   "storage-driver": "overlay2"
 }
-EOF
+EOF"
 
-mkdir -p /etc/systemd/system/docker.service.d
-su - ubuntu 
+sudo mkdir -p /etc/systemd/system/docker.service.d
 
-# Restart docker.
-sudo systemctl daemon-reload && sudo systemctl restart docker && sudo systemctl enable docker
+## Restart service
+sudo systemctl daemon-reload && sudo systemctl restart docker
+
+# Run as non-root user
+sudo usermod -aG docker $(whoami)
 
 
 
 
-## Create /etc/docker directory.
+## Centos 7
+## Install prerequisites.
+#yum install yum-utils device-mapper-persistent-data lvm2 -y
+#sudo apt-get install  curl apt-transport-https ca-certificates gnupg-agent software-properties-common -y
+## Add docker repository.
+# yum-config-manager \
+#     --add-repo \
+#     https://download.docker.com/linux/centos/docker-ce.repo
+
+ ## Create /etc/docker directory.
 # mkdir /etc/docker
 
 # Setup daemon.
@@ -61,4 +81,15 @@ sudo systemctl daemon-reload && sudo systemctl restart docker && sudo systemctl 
 # EOF
 
 # mkdir -p /etc/systemd/system/docker.service.d
+
+# Restart docker.
+#sudo systemctl daemon-reload && sudo systemctl restart docker && sudo systemctl enable docker
+
+
+
+
+.
+
+
+ 
 
