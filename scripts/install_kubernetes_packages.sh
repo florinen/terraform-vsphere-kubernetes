@@ -1,21 +1,46 @@
 #! /bin/bash
 
 ## Ubuntu ##
-sudo su -
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
-su - ubuntu
 
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo su - -c "cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF"
+
+#sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 
 sudo apt-get install -y nfs-common kubelet kubeadm kubectl kubernetes-cni openssl jq
 sudo apt-mark hold kubelet kubeadm kubectl 
 sudo systemctl enable kubelet && sudo  systemctl start kubelet
- 
- 
+
+## CRI-O as CRI runtime 
+sudo su - c "cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF"
+
+sysctl --system
+
+# Install prerequisites
+apt-get update
+apt-get install software-properties-common
+
+add-apt-repository ppa:projectatomic/ppa
+apt-get update
+
+# Install CRI-O
+apt-get install cri-o-1.13
+systemctl start crio
 
 
+# sudo su - -c "cat <<EOF >>/etc/ufw/sysctl.conf 
+# net/bridge/bridge-nf-call-ip6tables = 1
+# net/bridge/bridge-nf-call-iptables = 1
+# net/bridge/bridge-nf-call-arptables = 1
+# EOF"
+
+# sudo sysctl -p
 
 
 
