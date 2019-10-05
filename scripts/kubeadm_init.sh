@@ -1,5 +1,5 @@
 #! /bin/bash
-IPADDRESS=$(ip address show dev eth0 | grep 'inet ' | awk '{print $2}' | cut -d"/" -f1)
+IPADDRESS=$(ip address show dev  ens192 | grep 'inet ' | awk '{print $2}' | cut -d "/" -f1)
 echo "--> pull kubeadm images <--"
 kubeadm config images pull
 
