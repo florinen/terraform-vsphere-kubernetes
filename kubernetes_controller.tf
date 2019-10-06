@@ -38,6 +38,7 @@ resource "vsphere_resource_pool" "vm_resource_pool" {
 }
 
 resource "vsphere_virtual_machine" "kubernetes_controller" {
+  count            = "${var.virtual_machine_kubernetes_controller["count"]}"
   name             = "${var.virtual_machine_kubernetes_controller["name"]}"
   resource_pool_id = "${vsphere_resource_pool.vm_resource_pool.id}"
   datastore_id     = "${data.vsphere_datastore.vm_datastore.id}"
