@@ -11,6 +11,6 @@ output "node_vm-morefs" {
    value = "${vsphere_virtual_machine.kubernetes_nodes.*.moid}"
 }
 output "kubeadm-init-info" {
-   value = "${data.external.kubeadm-init-info.result}"
+   value = "${data.external.kubeadm-init-info.result["content"]}"
 }
 
