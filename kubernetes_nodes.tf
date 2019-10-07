@@ -158,7 +158,7 @@ resource "null_resource" "kubeadm_join" {
     # Command #  "kubeadm join --token ${vsphere_virtual_machine.kubernetes_controller.*.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}",
     inline = [
        "echo 'Running the kubeadm join command.'",
-       "kubeadm join --token ${vsphere_virtual_machine.kubernetes_controller.0.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}",
+       "kubeadm join --token ${vsphere_virtual_machine.kubernetes_controller.*.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}",
        "sleep 300"
 
     ]
