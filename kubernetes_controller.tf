@@ -38,7 +38,7 @@ resource "vsphere_resource_pool" "vm_resource_pool" {
 }
 
 resource "vsphere_virtual_machine" "kubernetes_controller" {
-  count            = "${var.virtual_machine_kubernetes_controller["count"]}"
+  #count            = "${var.virtual_machine_kubernetes_controller["count"]}"
   name             = "${var.virtual_machine_kubernetes_controller["name"]}"
   resource_pool_id = "${vsphere_resource_pool.vm_resource_pool.id}"
   datastore_id     = "${data.vsphere_datastore.vm_datastore.id}"
@@ -172,7 +172,7 @@ resource "vsphere_virtual_machine" "kubernetes_controller" {
 data "external" "kubeadm-init-info" {
   program = ["bash", "${path.module}/scripts/kubeadm_init_info.sh"]
   query = {
-    ip_address  = "${vsphere_virtual_machine.kubernetes_controller.0.["ip_address"]}"
+    ip_address  = "${vsphere_virtual_machine.kubernetes_controller["ip_address"]}"
     private_key = "${var.virtual_machine_kubernetes_controller["private_key"]}"
   }
 }

@@ -38,7 +38,7 @@ variable "virtual_machine_kubernetes_controller" {
   description               = "Configuration details for kubernetes_controller virtual machine"
 
   default = {
-    count                  = 1
+    #count                  = 1
     # name of the virtual machine to be deployed. defaults to "kubernetes-controller"
     name                    = ""
     # name of the datastore to deploy kubernetes_controller to. defaults to "datastore1"
