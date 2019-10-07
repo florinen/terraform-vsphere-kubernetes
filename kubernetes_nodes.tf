@@ -155,14 +155,8 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
 resource "null_resource" "kubeadm_join" {
   count            = "${var.virtual_machine_kubernetes_node["count"]}"
   provisioner "remote-exec" {
-    # Command #  "kubeadm join --token ${vsphere_virtual_machine.kubernetes_controller.*.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}",
     inline = [
-       "echo 'Running the kubeadm join command.'",
-       "kubeadm join --token ${data.external.kubeadm-init-info.result.token} ${vsphere_virtual_machine.kubernetes_controller.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}",
-
-       #"kubeadm join --token ${vsphere_virtual_machine.kubernetes_controller.*.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}",
-       "sleep 300"
-
+       "kubeadm join --token ${data.external.kubeadm-init-info.result.token} ${vsphere_virtual_machine.kubernetes_controller.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}"
     ]
     connection {
       host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}" 
