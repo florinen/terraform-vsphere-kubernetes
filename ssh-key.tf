@@ -9,3 +9,8 @@ resource "null_resource" "ssh-keygen-delete" {
         command = "ssh-keygen -R ${var.virtual_machine_kubernetes_controller["ip_address"]}"
     }
 }
+resource "null_resource" "ssh-keygen-delete-nodes" {
+    provisioner "local-exec" {
+        command = "ssh-keygen -R ${cidrhost( var.virtual_machine_kubernetes_node["ip_address_network"], var.virtual_machine_kubernetes_node["starting_hostnum"])}"
+    }
+}

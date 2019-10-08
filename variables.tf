@@ -87,7 +87,7 @@ variable "virtual_machine_kubernetes_node" {
     # the start_hostnum should be set to the 4th octet of the first kubernetes_node virtual machine. this will be combined with the count.index to determine the 4th octet of the ip address for each kuberenetes_node virtual machine. defaults to "101"
     starting_hostnum      = ""
     # dns server assigned to kubernetes_node virtual machines. defaults to "8.8.8.8"
-    dns_server              = "8.8.8.8"
+    dns_server              = ""
     # default gateway to be assigned to kubernetes_node virtual machines. empty by default
     gateway                 = ""
     # resource pool to deploy kubernetes_node virtual machines to. empty by default
@@ -95,7 +95,7 @@ variable "virtual_machine_kubernetes_node" {
     # number of vcpu assigned to kubernetes_node virtual machines. default is 2
     num_cpus = 2
     # amount of memory assigned to kubernetes_node virtual machines. default is 4096 (4GB)
-    memory   = 2048
+    memory   = ""
     domain   = ""
     label    = ""
   }

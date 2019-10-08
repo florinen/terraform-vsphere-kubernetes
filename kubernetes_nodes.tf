@@ -1,7 +1,7 @@
-# data "vsphere_datastore" "node_datastore" {
-#   name          = "${var.virtual_machine_kubernetes_node["datastore"]}"
-#   datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
-# }
+data "vsphere_datastore" "node_datastore" {
+  name          = "${var.virtual_machine_kubernetes_node["datastore"]}"
+  datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
+}
 
 # data "vsphere_resource_pool" "node_resource_pool" {
 #   name          = "${var.virtual_machine_kubernetes_node["resource_pool"]}"
@@ -11,16 +11,16 @@
 #   name = "${var.virtual_machine_kubernetes_controller["drs_cluster"]}"
 #   datacenter_id = "${var.vsphere_datacenter.template_datacenter.id}"
 # }
-# data "vsphere_network" "node_network" {
-#   name          = "${var.virtual_machine_kubernetes_node["network"]}"
-#   datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
-# }
+data "vsphere_network" "node_network" {
+  name          = "${var.virtual_machine_kubernetes_node["network"]}"
+  datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
+}
 
 resource "vsphere_virtual_machine" "kubernetes_nodes" {
   count            = "${var.virtual_machine_kubernetes_node["count"]}"
   name             = "${format("${var.virtual_machine_kubernetes_node["prefix"]}-%03d", count.index + 1)}"
-  resource_pool_id = "${vsphere_resource_pool.resource_pool.id}"
-  datastore_id     = "${data.vsphere_datastore.vm_datastore.id}"
+  resource_pool_id = "${vsphere_resource_pool.vm_resource_pool.id}"
+  datastore_id     = "${data.vsphere_datastore.node_datastore.id}"
   folder           = "${vsphere_folder.folder.path}"
   num_cpus = "${var.virtual_machine_kubernetes_node["num_cpus"]}"
   memory   = "${var.virtual_machine_kubernetes_node["memory"]}"
@@ -109,7 +109,7 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
     inline =[
       "cat /tmp/my_ssh_keys >> $HOME/.ssh/authorized_keys",
       "rm -f '/tmp/my_ssh_keys'",
-      "sudo sed -i 's/preserve_hostname:.*/preserve_hostname: true/' /etc/cloud/cloud.cfg",
+      #"sudo sed -i 's/preserve_hostname:.*/preserve_hostname: true/' /etc/cloud/cloud.cfg",
       # "IPADDRESS=$(ip address show dev ens160 | grep 'inet '| awk '{print $2}'| cut -d '/' -f1)",
       # "echo $IPADDRESS    $HOSTNAME >> /etc/hosts",
       # "sudo init 6"
@@ -138,9 +138,9 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/*sh",
-      "sudo /tmp/system_setup.sh",
-      "sudo /tmp/install_docker.sh",
-      "sudo /tmp/install_kubernetes_packages.sh",
+      # "sudo /tmp/system_setup.sh",
+      # "sudo /tmp/install_docker.sh",
+      # "sudo /tmp/install_kubernetes_packages.sh",
     ]
     connection {
       host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}" 
@@ -152,18 +152,18 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
 
 }
 
-resource "null_resource" "kubeadm_join" {
-  count            = "${var.virtual_machine_kubernetes_node["count"]}"
-  provisioner "remote-exec" {
-    inline = [
-       "kubeadm join --token ${data.external.kubeadm-init-info.result.token} ${vsphere_virtual_machine.kubernetes_controller.*.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}",
-    ]
-    connection {
-      host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}" 
-      type          = "${var.virtual_machine_template["connection_type"]}"
-      user          = "${var.virtual_machine_template["connection_user"]}"
-      private_key   = "${file("${var.virtual_machine_kubernetes_controller["private_key"]}")}"
+# resource "null_resource" "kubeadm_join" {
+#   count            = "${var.virtual_machine_kubernetes_node["count"]}"
+#   provisioner "remote-exec" {
+#     inline = [
+#        "kubeadm join --token ${data.external.kubeadm-init-info.result.token} ${vsphere_virtual_machine.kubernetes_controller.default_ip_address}:6443 --discovery-token-ca-cert-hash sha256:${data.external.kubeadm-init-info.result.certhash}",
+#     ]
+#     connection {
+#       host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}" 
+#       type          = "${var.virtual_machine_template["connection_type"]}"
+#       user          = "${var.virtual_machine_template["connection_user"]}"
+#       private_key   = "${file("${var.virtual_machine_kubernetes_controller["private_key"]}")}"
       
-    }
-  }
-}
+#     }
+#   }
+# }

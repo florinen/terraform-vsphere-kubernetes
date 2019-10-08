@@ -13,7 +13,7 @@ data "vsphere_datastore" "vm_datastore" {
   name          = "${var.virtual_machine_kubernetes_controller["datastore"]}"
   datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
 }
-data "vsphere_compute_cluster" "cluster" {
+data "vsphere_compute_cluster" "vm_cluster" {
   name = "${var.virtual_machine_kubernetes_controller["drs_cluster"]}"
   datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
 }
@@ -32,14 +32,14 @@ resource "vsphere_folder" "folder" {
   type   = "vm"
   datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
 }
-resource "vsphere_resource_pool" "resource_pool" {
+resource "vsphere_resource_pool" "vm_resource_pool" {
   name          = "${var.virtual_machine_kubernetes_controller["resource_pool"]}"
-  parent_resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
+  parent_resource_pool_id = "${data.vsphere_compute_cluster.vm_cluster.resource_pool_id}"
 }
 
 resource "vsphere_virtual_machine" "kubernetes_controller" {
   name             = "${var.virtual_machine_kubernetes_controller["name"]}"
-  resource_pool_id = "${vsphere_resource_pool.resource_pool.id}"
+  resource_pool_id = "${vsphere_resource_pool.vm_resource_pool.id}"
   datastore_id     = "${data.vsphere_datastore.vm_datastore.id}"
   folder           = "${vsphere_folder.folder.path}"
   num_cpus = "${var.virtual_machine_kubernetes_controller["num_cpus"]}"
@@ -95,12 +95,12 @@ resource "vsphere_virtual_machine" "kubernetes_controller" {
 
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p /root/.ssh/",
-      "chmod 700 /root/.ssh",
-      "mv /tmp/authorized_keys /root/.ssh/authorized_keys",
-      "chmod 600 /root/.ssh/authorized_keys",
-      "sed -i 's/#PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config",
-      "service sshd restart"
+      "mkdir -p ~/.ssh/",
+      "chmod 700 ~/.ssh",
+      "mv /tmp/authorized_keys ~/.ssh/authorized_keys",
+      "chmod 600 ~/.ssh/authorized_keys",
+      "sudo sed -i 's/#PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config",
+      "sudo service sshd restart"
     ]
     connection {
       host          = "${var.virtual_machine_kubernetes_controller["ip_address"]}"
@@ -152,11 +152,11 @@ resource "vsphere_virtual_machine" "kubernetes_controller" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/*sh",
-      "sudo /tmp/system_setup.sh",
-      "sudo /tmp/install_docker.sh",
-      "sudo /tmp/install_kubernetes_packages.sh",
-      "sudo /tmp/kubeadm_init.sh",
-      "tail -n2 /tmp/kubeadm_init_output.txt | head -n 1",
+      # "sudo /tmp/system_setup.sh",
+      # "sudo /tmp/install_docker.sh",
+      # "sudo /tmp/install_kubernetes_packages.sh",
+      # "sudo /tmp/kubeadm_init.sh",
+      # "tail -n2 /tmp/kubeadm_init_output.txt | head -n 1",
     ]
     connection {
       host     = "${self.default_ip_address}"
@@ -169,7 +169,7 @@ resource "vsphere_virtual_machine" "kubernetes_controller" {
 }
 
 # data "external" "kubeadm-init-info" {
-#   program = ["/usr/bin/bash", "${path.module}/scripts/kubeadm_init_info.sh"]
+#   program = ["bash", "${path.module}/scripts/kubeadm_init_info.sh"]
 #   query = {
 #     ip_address  = "${vsphere_virtual_machine.kubernetes_controller.default_ip_address}"
 #     private_key = "${var.virtual_machine_kubernetes_controller["private_key"]}"

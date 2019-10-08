@@ -1,12 +1,9 @@
 #! /bin/bash
 
 # disable swap since kubeadm documentation suggests disabling it
-swapoff -a
-sudo sed -i '/swap/d' /etc/fstab
-
-# disable firewalld and SELinux
-# systemctl disable firewalld
-# systemctl stop firewalld
-# sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
-# setenforce 0
+sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+sudo echo "vm.swappiness=0" | sudo tee --append /etc/sysctl.conf
+ sudo sysctl -p
+# sudo sed -i '/swap/d' /etc/fstab
 exit
