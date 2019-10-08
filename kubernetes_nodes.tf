@@ -11,10 +11,10 @@ data "vsphere_datastore" "node_datastore" {
 #   name = "${var.virtual_machine_kubernetes_controller["drs_cluster"]}"
 #   datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
 # }
-data "vsphere_network" "node_network" {
-  name          = "${var.virtual_machine_kubernetes_node["network"]}"
-  datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
-}
+# data "vsphere_network" "node_network" {
+#   name          = "${var.virtual_machine_kubernetes_node["network"]}"
+#   datacenter_id = "${data.vsphere_datacenter.template_datacenter.id}"
+# }
 
 
 resource "vsphere_virtual_machine" "kubernetes_nodes" {
