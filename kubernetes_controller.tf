@@ -1,9 +1,17 @@
 provider "vsphere" {
+  version        = "~> 1.13"
   user           = "${var.vsphere_connection["vsphere_user"]}"
   password       = "${var.vsphere_connection["vsphere_password"]}"
   vsphere_server = "${var.vsphere_connection["vsphere_server"]}"
   allow_unverified_ssl = true
 }
+provider "external" {
+  version  = "~> 1.2"
+}
+provider "null" {
+  version  = "~> 2.1"
+}
+
 
 data "vsphere_datacenter" "template_datacenter" {
   name = "${var.virtual_machine_template["datacenter"]}"
@@ -46,9 +54,9 @@ resource "vsphere_virtual_machine" "kubernetes_controller" {
   num_cpus = "${var.virtual_machine_kubernetes_controller["num_cpus"]}"
   memory   = "${var.virtual_machine_kubernetes_controller["memory"]}"
   guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
-  enable_disk_uuid = "true"
   scsi_type = "${data.vsphere_virtual_machine.template.scsi_type}"
-
+  enable_disk_uuid = "true"
+  annotation = "Managed by Terraform"  
   network_interface {
     network_id   = "${data.vsphere_network.vm_network.id}"
     adapter_type = "${data.vsphere_virtual_machine.template.network_interface_types[0]}"

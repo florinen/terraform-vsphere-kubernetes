@@ -26,8 +26,9 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
   num_cpus = "${var.virtual_machine_kubernetes_node["num_cpus"]}"
   memory   = "${var.virtual_machine_kubernetes_node["memory"]}"
   guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
-
   scsi_type = "${data.vsphere_virtual_machine.template.scsi_type}"
+  enable_disk_uuid = "true"
+  annotation = "Managed by Terraform"
 
   network_interface {
     network_id   = "${data.vsphere_network.vm_network.id}"
