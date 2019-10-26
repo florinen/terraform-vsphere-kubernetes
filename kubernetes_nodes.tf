@@ -68,7 +68,8 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
     destination = "/tmp/authorized_keys"
 
     connection {
-      host        = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}"
+      host        = "${element(self.*.default_ip_address, count.index)}"
+      #host        = "${vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address[count.index]}"
       type        = "${var.virtual_machine_template["connection_type"]}"
       user        = "${var.virtual_machine_template["connection_user"]}"
       password    = "${var.virtual_machine_template["connection_password"]}"
@@ -86,7 +87,7 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
     ]
     
     connection {
-      host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}"
+      host          = "${element(self.*.default_ip_address, count.index)}"
       type          = "${var.virtual_machine_template["connection_type"]}"
       user          = "${var.virtual_machine_template["connection_user"]}"
       password      = "${var.virtual_machine_template["connection_password"]}"
@@ -99,7 +100,7 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
     destination = "/tmp/my_ssh_keys"
     
     connection {
-      host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}"
+      host          = "${element(self.*.default_ip_address, count.index)}"
       type          = "${var.virtual_machine_template["connection_type"]}"
       user          = "${var.virtual_machine_template["connection_user"]}"
       private_key   = "${file("${var.virtual_machine_kubernetes_controller["private_key"]}")}" 
@@ -117,7 +118,7 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
     ]
   
     connection {
-      host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}"
+      host          = "${element(self.*.default_ip_address, count.index)}"
       type          = "${var.virtual_machine_template["connection_type"]}"
       user          = "${var.virtual_machine_template["connection_user"]}"
       private_key   = "${file("${var.virtual_machine_kubernetes_controller["private_key"]}")}" 
@@ -129,7 +130,7 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
     destination = "/tmp/"
 
     connection {
-      host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}"
+      host          = "${element(self.*.default_ip_address, count.index)}"
       type          = "${var.virtual_machine_template["connection_type"]}"
       user          = "${var.virtual_machine_template["connection_user"]}"
       private_key   = "${file("${var.virtual_machine_kubernetes_controller["private_key"]}")}" 
@@ -144,7 +145,7 @@ resource "vsphere_virtual_machine" "kubernetes_nodes" {
       "sudo /tmp/install_kubernetes_packages.sh",
     ]
     connection {
-      host          = "${element(vsphere_virtual_machine.kubernetes_nodes.*.default_ip_address, count.index)}" 
+      host          = "${element(self.*.default_ip_address, count.index)}" 
       type          = "${var.virtual_machine_template["connection_type"]}"
       user          = "${var.virtual_machine_template["connection_user"]}"
       private_key   = "${file("${var.virtual_machine_kubernetes_controller["private_key"]}")}" 
