@@ -59,8 +59,8 @@ EOF
 # #Set SELinux in permissive mode (effectively disabling it)
 # setenforce 0
 # sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
-
-yum install -y nfs-utils kubelet kubeadm kubectl openssl --disableexcludes=kubernetes
+yum install -y nfs-utils kubelet-1.15.5 kubeadm-1.15.5 kubectl-1.15.5 openssl --disableexcludes=kubernetes
+# yum install -y nfs-utils kubelet kubeadm kubectl openssl --disableexcludes=kubernetes
 systemctl enable kubelet && systemctl start kubelet
 
 cat <<EOF >  /etc/sysctl.d/k8s.conf
